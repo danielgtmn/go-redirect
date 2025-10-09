@@ -236,10 +236,7 @@ Images are automatically built and pushed when:
 - Opening pull requests
 - After successful releases (versioned builds)
 
-**Releases are automatically created** from the `release` branch when commits follow [Conventional Commit](https://conventionalcommits.org/) format:
-- `feat:` commits trigger minor version bumps
-- `fix:` commits trigger patch version bumps
-- `feat!:` or `BREAKING CHANGE:` trigger major version bumps
+**Releases are created** by pushing version tags (e.g., `v1.0.0`) to the repository
 
 ### Image Tags
 
@@ -383,10 +380,23 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 **For Maintainers:**
 
-1. **Merge approved changes** from main to release branch
-2. **Push to release branch** to trigger semantic release
-3. **Monitor GitHub Actions** for successful release creation
-4. **Merge release back** to main after successful release
+1. **Ensure all changes are merged** to main branch
+2. **Run the release script** to create a new version tag
+3. **Monitor GitHub Actions** for automatic release creation
+
+```bash
+# Create a new release
+./release.sh
+
+# Or manually create a tag
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+```
+
+**What happens automatically:**
+- ✅ GitHub Release wird erstellt
+- ✅ Docker Images werden gebaut und getaggt
+- ✅ Release Notes werden aus Commits generiert
 
 ### Branch Protection
 
@@ -420,7 +430,7 @@ git push origin main
 
 ### Commit Convention
 
-This project uses [Conventional Commits](https://conventionalcommits.org/) for automated version management and releases. Commit messages are automatically validated using Husky and Commitlint.
+This project uses descriptive commit messages. While not strictly enforced, following conventional patterns helps with release notes generation.
 
 **Valid commit types:**
 ```bash
