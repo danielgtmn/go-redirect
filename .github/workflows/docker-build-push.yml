@@ -20,10 +20,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    # Only run if tests passed (for workflow_run trigger)
-    if: >
-      github.event_name != 'workflow_run' ||
-      github.event.workflow_run.conclusion == 'success'
 
     steps:
       - name: Checkout repository
