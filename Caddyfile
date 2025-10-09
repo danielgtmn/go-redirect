@@ -1,0 +1,28 @@
+# Main domain (required)
+{$CADDY_DOMAIN:localhost} {
+    # Automatic HTTPS when EMAIL is set
+    {$CADDY_EMAIL:}
+
+    # Basic redirection
+    {$CADDY_UPSTREAM:http://localhost:8080}
+
+    # Additional headers
+    {$CADDY_HEADERS:}
+
+    # Rate limiting
+    {$CADDY_RATE_LIMIT:}
+
+    # Basic auth
+    {$CADDY_BASIC_AUTH:}
+
+    # Redirects
+    {$CADDY_REDIRECTS:}
+
+    # Reverse proxy settings
+    reverse_proxy {$CADDY_UPSTREAM} {
+        {$CADDY_PROXY_HEADERS:}
+    }
+}
+
+# Additional domains (optional, comma separated)
+{$CADDY_ADDITIONAL_DOMAINS:}
