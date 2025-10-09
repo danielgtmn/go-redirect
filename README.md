@@ -232,10 +232,10 @@ This repository includes GitHub Actions workflows that automatically build and p
 ### Automatic Builds & Releases
 
 Images are automatically built and pushed when:
-- Pushing to the `main` branch
+- Pushing to the `main` or `release` branch
 - Opening pull requests
 
-**Releases are automatically created** when commits follow [Conventional Commit](https://conventionalcommits.org/) format:
+**Releases are automatically created** from the `release` branch when commits follow [Conventional Commit](https://conventionalcommits.org/) format:
 - `feat:` commits trigger minor version bumps
 - `fix:` commits trigger patch version bumps
 - `feat!:` or `BREAKING CHANGE:` trigger major version bumps
@@ -249,21 +249,32 @@ Available tags in `ghcr.io/danielgtmn/caddy-redirect`:
 - `v1.2` - Major.minor version tags
 - `v1` - Major version tags
 
-### Example Release Flow
+### Release Workflow
 
 ```bash
-# Make changes
+# Development on main branch
+git checkout main
+# Make your changes...
 git add .
 git commit -m "feat: add support for custom headers"
-
-# Push to main
 git push origin main
 
-# → GitHub Actions automatically:
-#   1. Runs tests
-#   2. Builds and pushes Docker image
-#   3. Creates GitHub release (e.g., v1.1.0)
-#   4. Updates CHANGELOG.md
+# → CI: Tests run, Docker image built and pushed
+
+# When ready for release, create release branch
+git checkout -b release
+git push origin release
+
+# → Release: Semantic release creates GitHub release
+#   1. Analyzes commits since last release
+#   2. Bumps version (patch/minor/major)
+#   3. Creates GitHub release with changelog
+#   4. Pushes versioned Docker image
+
+# After release, merge back to main
+git checkout main
+git merge release
+git push origin main
 ```
 
 ### Using Built Images
@@ -366,6 +377,28 @@ Contributions are welcome! Please feel free to submit a Pull Request.
    ```bash
    pnpm run prepare  # or npm run prepare
    ```
+
+### Release Process
+
+**For Maintainers:**
+
+1. **Merge approved changes** from main to release branch
+2. **Push to release branch** to trigger semantic release
+3. **Monitor GitHub Actions** for successful release creation
+4. **Merge release back** to main after successful release
+
+```bash
+# Create release branch from main
+git checkout main
+git pull origin main
+git checkout -b release
+git push origin release
+
+# After successful release, merge back
+git checkout main
+git merge release
+git push origin main
+```
 
 ### Commit Convention
 
