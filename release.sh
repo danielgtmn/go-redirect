@@ -29,9 +29,9 @@ if [ -n "$(git status --porcelain)" ]; then
     exit 1
 fi
 
-# Get current version from latest tag
-CURRENT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-echo -e "${YELLOW}Current version: ${CURRENT_VERSION}${NC}"
+# Get latest version tag
+LATEST_TAG=$(git tag --sort=-version:refname | head -n1 || echo "v0.0.0")
+echo -e "${YELLOW}Latest tag: ${LATEST_TAG}${NC}"
 
 # Ask for new version
 echo -e "\n${YELLOW}What type of release?${NC}"
@@ -44,17 +44,17 @@ read -p "Choose (1-4): " choice
 case $choice in
     1)
         # Extract version numbers
-        IFS='.' read -r major minor patch <<< "${CURRENT_VERSION#v}"
+        IFS='.' read -r major minor patch <<< "${LATEST_TAG#v}"
         new_patch=$((patch + 1))
         NEW_VERSION="v${major}.${minor}.${new_patch}"
         ;;
     2)
-        IFS='.' read -r major minor patch <<< "${CURRENT_VERSION#v}"
+        IFS='.' read -r major minor patch <<< "${LATEST_TAG#v}"
         new_minor=$((minor + 1))
         NEW_VERSION="v${major}.${new_minor}.0"
         ;;
     3)
-        IFS='.' read -r major minor patch <<< "${CURRENT_VERSION#v}"
+        IFS='.' read -r major minor patch <<< "${LATEST_TAG#v}"
         new_major=$((major + 1))
         NEW_VERSION="v${new_major}.0.0"
         ;;
@@ -69,6 +69,14 @@ case $choice in
 esac
 
 echo -e "${GREEN}New version: ${NEW_VERSION}${NC}"
+
+# Check if tag already exists
+if git tag --list | grep -q "^${NEW_VERSION}$"; then
+    echo -e "${RED}❌ Error: Tag ${NEW_VERSION} already exists!${NC}"
+    echo -e "Choose a different version or delete the existing tag:"
+    echo -e "git tag -d ${NEW_VERSION} && git push origin :refs/tags/${NEW_VERSION}"
+    exit 1
+fi
 
 # Confirm
 read -p "Create release ${NEW_VERSION}? (y/N): " confirm
@@ -85,11 +93,12 @@ git tag -a "${NEW_VERSION}" -m "Release ${NEW_VERSION}"
 echo -e "\n${YELLOW}Pushing tag to GitHub...${NC}"
 git push origin "${NEW_VERSION}"
 
-echo -e "\n${GREEN}✅ Release ${NEW_VERSION} created!${NC}"
+echo -e "\n${GREEN}✅ Tag ${NEW_VERSION} created and pushed!${NC}"
 echo -e "\n${BLUE}What happens next:${NC}"
-echo "1. GitHub Actions will build and push Docker images"
-echo "2. A GitHub Release will be created automatically"
-echo "3. Docker images will be available at:"
+echo "1. GitHub Actions will build and push Docker images automatically"
+echo "2. Go to GitHub Actions → 'Create Release' workflow"
+echo "3. Click 'Run workflow' and enter: ${NEW_VERSION#v}"
+echo "4. Docker images will be available at:"
 echo "   - ghcr.io/danielgtmn/caddy-redirect:${NEW_VERSION#v}"
 echo "   - ghcr.io/danielgtmn/caddy-redirect:latest"
 echo -e "\n${YELLOW}Monitor the progress at:${NC}"

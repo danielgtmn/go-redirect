@@ -381,22 +381,33 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 **For Maintainers:**
 
 1. **Ensure all changes are merged** to main branch
-2. **Run the release script** to create a new version tag
-3. **Monitor GitHub Actions** for automatic release creation
+2. **Run the release script** to create and push a version tag
+3. **Manually trigger** the GitHub Release workflow
 
 ```bash
-# Create a new release
+# 1. Create and push version tag
 ./release.sh
 
-# Or manually create a tag
-git tag -a v1.0.0 -m "Release v1.0.0"
-git push origin v1.0.0
+# 2. Go to GitHub Actions → "Create Release" workflow
+# 3. Click "Run workflow"
+# 4. Enter the version number (without 'v')
+# 5. Choose if it's a pre-release
 ```
 
-**What happens automatically:**
-- ✅ GitHub Release wird erstellt
-- ✅ Docker Images werden gebaut und getaggt
-- ✅ Release Notes werden aus Commits generiert
+**Alternative manual approach:**
+```bash
+# Create tag manually
+git tag -a v1.0.0 -m "Release v1.0.0"
+git push origin v1.0.0
+
+# Then trigger release workflow manually
+```
+
+**What happens:**
+- ✅ Git Tag wird erstellt und gepusht
+- ✅ Docker Images werden automatisch gebaut (latest + version)
+- ✅ GitHub Release wird manuell erstellt mit Release Notes
+- ✅ Release Notes werden automatisch aus Commits generiert
 
 ### Branch Protection
 

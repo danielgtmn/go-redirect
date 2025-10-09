@@ -1,9 +1,17 @@
 name: Create Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   create-release:
@@ -22,8 +30,7 @@ jobs:
       - name: Get release notes
         id: release-notes
         run: |
-          # Extract version from tag
-          VERSION=${GITHUB_REF#refs/tags/v}
+          VERSION="${{ inputs.version }}"
 
           # Generate release notes from recent commits
           echo "## What's Changed" > release_notes.md
@@ -38,7 +45,9 @@ jobs:
           fi
 
           echo "" >> release_notes.md
-          echo "**Full Changelog**: https://github.com/danielgtmn/caddy-redirect/compare/$LAST_TAG...v$VERSION" >> release_notes.md
+          if [ -n "$LAST_TAG" ]; then
+            echo "**Full Changelog**: https://github.com/danielgtmn/caddy-redirect/compare/$LAST_TAG...v$VERSION" >> release_notes.md
+          fi
 
           # Set output
           {
@@ -53,8 +62,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release v${{ steps.release-notes.outputs.version }}
+          tag_name: v${{ inputs.version }}
+          release_name: Release v${{ inputs.version }}
           body: ${{ steps.release-notes.outputs.release_notes }}
           draft: false
-          prerelease: false
+          prerelease: ${{ inputs.prerelease }}

@@ -9,10 +9,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_run:
-    workflows: ["Test", "Release"]
-    types:
-      - completed
 
 env:
   REGISTRY: ghcr.io
