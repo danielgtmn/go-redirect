@@ -232,8 +232,9 @@ This repository includes GitHub Actions workflows that automatically build and p
 ### Automatic Builds & Releases
 
 Images are automatically built and pushed when:
-- Pushing to the `main` or `release` branch
+- Pushing to the `main` branch (development builds)
 - Opening pull requests
+- After successful releases (versioned builds)
 
 **Releases are automatically created** from the `release` branch when commits follow [Conventional Commit](https://conventionalcommits.org/) format:
 - `feat:` commits trigger minor version bumps
@@ -269,7 +270,7 @@ git push origin release
 #   1. Analyzes commits since last release
 #   2. Bumps version (patch/minor/major)
 #   3. Creates GitHub release with changelog
-#   4. Pushes versioned Docker image
+#   4. Triggers build of versioned Docker image
 
 # After release, merge back to main
 git checkout main
