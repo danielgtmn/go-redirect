@@ -388,6 +388,23 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. **Monitor GitHub Actions** for successful release creation
 4. **Merge release back** to main after successful release
 
+### Branch Protection
+
+This repository uses branch protection to ensure code quality:
+
+#### `main` Branch (Development)
+- ✅ **Require PR reviews** - All changes need approval
+- ✅ **Require status checks** - Tests must pass
+- ✅ **Require up-to-date branches** - Must merge latest changes
+
+#### `release` Branch (Production)
+- ✅ **Require PR reviews** - Release changes need approval
+- ✅ **Require status checks** - All tests must pass
+- ✅ **Restrict pushes** - Only maintainers can push directly
+- ✅ **Require up-to-date branches** - Must be current
+
+**Setup:** Go to Settings → Branches → Add rule for each branch
+
 ```bash
 # Create release branch from main
 git checkout main
