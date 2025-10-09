@@ -3,9 +3,6 @@
     # Automatic HTTPS when EMAIL is set
     {$CADDY_EMAIL:}
 
-    # Basic redirection
-    {$CADDY_UPSTREAM:http://localhost:8080}
-
     # Additional headers
     {$CADDY_HEADERS:}
 
@@ -19,7 +16,7 @@
     {$CADDY_REDIRECTS:}
 
     # Reverse proxy settings
-    reverse_proxy {$CADDY_UPSTREAM} {
+    reverse_proxy {$CADDY_UPSTREAM:http://localhost:8080} {
         {$CADDY_PROXY_HEADERS:}
     }
 }
