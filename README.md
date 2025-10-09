@@ -1,6 +1,11 @@
 # Caddy Redirect Docker Container
 
+[![Docker Build](https://github.com/danielgtmn/caddy-redirect/actions/workflows/docker-build-push.yml/badge.svg)](https://github.com/danielgtmn/caddy-redirect/actions)
+[![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Fdanielgtmn%2Fcaddy--redirect-blue)](https://ghcr.io/danielgtmn/caddy-redirect)
+
 A flexible Docker container based on Caddy that configures redirects and reverse proxy functions via environment variables.
+
+**🚀 Pre-built images available at: [`ghcr.io/danielgtmn/caddy-redirect`](https://ghcr.io/danielgtmn/caddy-redirect)**
 
 ## Quick Start
 
@@ -19,10 +24,10 @@ docker run -d \
   -e CADDY_UPSTREAM=http://your-app:8080 \
   -v caddy_data:/data \
   -v caddy_config:/config \
-  ghcr.io/YOUR_USERNAME/caddy-redirect:latest
+  ghcr.io/danielgtmn/caddy-redirect:latest
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username.
+Replace `danielgtmn` with your GitHub username if you're using a fork.
 
 ### Option 1: Docker Compose (Recommended)
 
@@ -233,7 +238,7 @@ Images are automatically built and pushed when:
 
 ### Image Tags
 
-Available tags in `ghcr.io/YOUR_USERNAME/caddy-redirect`:
+Available tags in `ghcr.io/danielgtmn/caddy-redirect`:
 - `latest` - Latest build from main branch
 - `main` - Latest build from main branch
 - `v1.2.3` - Specific version tags
@@ -249,7 +254,7 @@ docker run -d \
   -p 80:80 -p 443:443 \
   -e CADDY_DOMAIN=yourdomain.com \
   -e CADDY_UPSTREAM=http://your-app:8080 \
-  ghcr.io/YOUR_USERNAME/caddy-redirect:latest
+  ghcr.io/danielgtmn/caddy-redirect:latest
 ```
 
 ### Manual Workflow Triggers
@@ -284,6 +289,24 @@ CADDY_ADDITIONAL_DOMAINS=www.example.com,api.example.com,staging.example.com
 - Check the `CADDY_UPSTREAM` URL
 - Use `docker-compose logs` for detailed errors
 
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+### For Fork Users
+
+If you're using a fork of this repository, update the image references in the examples to point to your own GHCR registry:
+
+```bash
+# Replace danielgtmn with your GitHub username
+ghcr.io/YOUR_USERNAME/caddy-redirect:latest
+```
+
 ## Caddy Documentation
 
 For advanced configuration options, see the [official Caddy documentation](https://caddyserver.com/docs/).
+
+---
+
+**Repository**: [github.com/danielgtmn/caddy-redirect](https://github.com/danielgtmn/caddy-redirect) |
+**Docker Images**: [ghcr.io/danielgtmn/caddy-redirect](https://ghcr.io/danielgtmn/caddy-redirect)

@@ -3,7 +3,7 @@ version: '3.8'
 services:
   caddy:
     # Use pre-built image from GHCR or build locally
-    # image: ghcr.io/YOUR_USERNAME/caddy-redirect:latest
+    # image: ghcr.io/danielgtmn/caddy-redirect:latest
     build: .
     ports:
       - "80:80"
