@@ -4,6 +4,17 @@ on:
   push:
     branches:
       - release
+  workflow_dispatch:
+    inputs:
+      force_release:
+        description: 'Force a release (patch, minor, major)'
+        required: false
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   release:
