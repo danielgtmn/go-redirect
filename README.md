@@ -7,6 +7,13 @@ A flexible Docker container based on Caddy that configures redirects and reverse
 
 **🚀 Pre-built images available at: [`ghcr.io/danielgtmn/caddy-redirect`](https://ghcr.io/danielgtmn/caddy-redirect)**
 
+## Features
+
+- **Security by default** - Runs as non-root user, includes security headers out of the box
+- **Container orchestration ready** - Built-in healthcheck for Kubernetes/Docker Swarm
+- **Flexible configuration** - All settings via environment variables
+- **Automatic HTTPS** - Let's Encrypt integration with email configuration
+
 ## Quick Start
 
 ### Using Pre-built Images from GHCR
@@ -78,12 +85,25 @@ docker run -d \
 
 | Variable | Description | Example |
 |----------|-------------|---------|
+| `CADDY_SECURITY_HEADERS` | Additional security headers (added to defaults) | `Permissions-Policy "geolocation=()"` |
 | `CADDY_HEADERS` | Additional HTTP headers | `header X-Forwarded-Proto {scheme}` |
 | `CADDY_RATE_LIMIT` | Rate limiting rules | `rate_limit { zone static { key {remote} window 1m burst 10 } }` |
 | `CADDY_BASIC_AUTH` | Basic authentication | `basicauth { user $2a$14$... }` |
 | `CADDY_REDIRECTS` | URL redirects | `redir /old /new permanent` |
 | `CADDY_PROXY_HEADERS` | Proxy-specific headers | `header_up Host {host}` |
 | `CADDY_ADDITIONAL_DOMAINS` | Additional domains | `www.example.com,api.example.com` |
+
+### Default Security Headers
+
+The following security headers are enabled by default:
+
+| Header | Value |
+|--------|-------|
+| `X-Content-Type-Options` | `nosniff` |
+| `X-Frame-Options` | `DENY` |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` |
+
+Use `CADDY_SECURITY_HEADERS` to add additional headers like `Content-Security-Policy` or `Permissions-Policy`.
 
 ## Examples
 
@@ -356,6 +376,7 @@ The tests cover:
 | Syntax Validation | Caddyfile syntax check | ✅ Automated |
 | Docker Build | Container builds successfully | ✅ Automated |
 | Startup Test | Container starts without errors | ✅ Automated |
+| Healthcheck | Container health monitoring | ✅ Built-in |
 | HTTP Proxy | Requests are properly forwarded | ✅ Automated |
 | ENV Vars | Configuration via environment | ✅ Automated |
 | Integration | Full stack with backend | ✅ Manual/Local |

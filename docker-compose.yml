@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   caddy:
     # Use pre-built image from GHCR or build locally
@@ -17,6 +15,9 @@ services:
 
       # Upstream-Server (wo Anfragen weitergeleitet werden)
       - CADDY_UPSTREAM=${CADDY_UPSTREAM:-http://localhost:8080}
+
+      # Zusätzliche Security-Header (werden zu den Standard-Security-Headern hinzugefügt)
+      - CADDY_SECURITY_HEADERS=${CADDY_SECURITY_HEADERS:-}
 
       # Zusätzliche Header
       - CADDY_HEADERS=${CADDY_HEADERS:-}
