@@ -9,24 +9,8 @@ on:
       - main
 
 jobs:
-  validate:
-    name: Validate Configuration
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Validate Caddyfile syntax
-        run: |
-          docker run --rm -v $(pwd):/config caddy:2-alpine caddy validate --config /config/Caddyfile
-
-      - name: Check Dockerfile syntax
-        run: |
-          docker build --no-cache --target build -f Dockerfile . || true
-
-  test-docker-build:
-    name: Test Docker Build
+  test:
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -34,74 +18,34 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
+        run: docker build -t go-redirect:test .
+
+      - name: Start container
         run: |
-          docker build -t caddy-redirect:test .
+          docker run -d --name redirect-test \
+            -p 8080:8080 \
+            -e REDIRECT_TARGET=https://example.com \
+            -e PRESERVE_PATH=true \
+            go-redirect:test
+          sleep 2
 
-      - name: Test basic container startup
+      - name: Test health endpoint
         run: |
-          # Start container in background
-          docker run -d --name test-container \
-            -p 8080:80 \
-            -e CADDY_DOMAIN=localhost \
-            -e CADDY_UPSTREAM=http://httpbin.org \
-            caddy-redirect:test
+          curl -f http://localhost:8080/health | grep -q "OK"
 
-          # Wait for container to start
-          sleep 5
+      - name: Test redirect
+        run: |
+          LOCATION=$(curl -s -I http://localhost:8080/test/path | grep -i "^location:" | tr -d '\r')
+          echo "Location: $LOCATION"
+          echo "$LOCATION" | grep -q "https://example.com/test/path"
 
-          # Check if container is running
-          if ! docker ps | grep -q test-container; then
-            echo "Container failed to start"
-            docker logs test-container
-            exit 1
-          fi
-
-          # Test HTTP request to container
-          if curl -f -s http://localhost:8080 > /dev/null; then
-            echo "HTTP request successful"
-          else
-            echo "HTTP request failed"
-            docker logs test-container
-            exit 1
-          fi
+      - name: Test redirect code
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/)
+          [ "$HTTP_CODE" = "301" ]
 
       - name: Cleanup
         if: always()
         run: |
-          docker stop test-container || true
-          docker rm test-container || true
-
-  test-env-vars:
-    name: Test Environment Variables
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build test image
-        run: |
-          docker build -t caddy-redirect:env-test .
-
-      - name: Test environment variables
-        run: |
-          # Test that container accepts ENV vars
-          docker run -d --name env-test \
-            -p 8083:80 \
-            -e CADDY_DOMAIN=test.example.com \
-            -e CADDY_UPSTREAM=http://httpbin.org \
-            caddy-redirect:env-test
-
-          # Wait for container to start
-          sleep 5
-
-          # Check if container is running
-          if ! docker ps | grep -q env-test; then
-            echo "Container failed to start with ENV vars"
-            docker logs env-test
-            exit 1
-          fi
-
-          # Cleanup
-          docker stop env-test
-          docker rm env-test
+          docker stop redirect-test || true
+          docker rm redirect-test || true

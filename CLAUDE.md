@@ -1,64 +1,53 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-Caddy Redirect is a Docker container based on Caddy that configures reverse proxy and redirects via environment variables. Pre-built images are published to `ghcr.io/danielgtmn/caddy-redirect`.
+Go Redirect is a minimal Docker container that redirects HTTP requests to another URL. Written in Go, the final image is ~5MB.
 
 ## Common Commands
 
 ```bash
 # Build Docker image
-make build                    # Builds caddy-redirect:test image
+make build
 
-# Run all tests (includes build)
-make test                     # or ./test.sh
+# Run all tests
+make test
 
-# Validate Caddyfile syntax only
-make validate
-
-# Clean up test containers and images
+# Clean up
 make clean
 
 # Start with Docker Compose
-docker-compose up -d          # Uses .env file for configuration
-
-# Start test environment with mock backend
-docker-compose -f docker-compose.test.yml up -d
+docker-compose up -d
 ```
 
 ## Architecture
 
-The project is a minimal Docker container:
+- **main.go** - Go HTTP server with redirect logic
+- **go.mod** - Go module definition
+- **Dockerfile** - Multi-stage build (scratch-based)
+- **docker-compose.yml** - Docker Compose configuration
 
-- **Caddyfile** - Caddy server configuration using environment variable substitution (`{$VAR_NAME:default}` syntax)
-- **Dockerfile** - Simple Alpine-based image that copies Caddyfile into the container
-- **docker-compose.yml** - Production compose file reading from `.env`
-- **docker-compose.test.yml** - Test compose with nginx backend on port 8080
+## Environment Variables
 
-Key environment variables that configure the Caddyfile at runtime:
-- `CADDY_DOMAIN` (required) - Main domain to serve
-- `CADDY_UPSTREAM` - Backend server URL for reverse proxy
-- `CADDY_TLS` - TLS configuration (e.g., `tls admin@example.com` for Let's Encrypt)
-- `CADDY_SECURITY_HEADERS` - Additional security headers (default headers: X-Content-Type-Options, X-Frame-Options, Referrer-Policy)
-- `CADDY_HEADERS`, `CADDY_RATE_LIMIT`, `CADDY_BASIC_AUTH`, `CADDY_REDIRECTS`, `CADDY_PROXY_HEADERS`, `CADDY_ADDITIONAL_DOMAINS` - Optional configuration blocks
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `REDIRECT_TARGET` | Target URL (required) | - |
+| `REDIRECT_CODE` | 301 or 302 | `301` |
+| `PRESERVE_PATH` | Keep path and query | `true` |
+| `PORT` | Server port | `8080` |
 
-## Git Hooks and Commit Convention
+## Git Hooks
 
-Pre-commit hooks (via Husky) enforce:
-- **pre-commit**: Runs `make validate` to check Caddyfile syntax
-- **commit-msg**: Validates conventional commit format via commitlint
+Pre-commit hooks (via Husky):
+- **pre-commit**: Runs `make build` to verify the build
+- **commit-msg**: Validates conventional commit format
 
 Valid commit types: `feat`, `fix`, `docs`, `build`, `ci`, `chore`, `refactor`, `revert`, `style`, `test`, `perf`
-
-Setup hooks after cloning: `pnpm install` (or `npm install`)
 
 ## CI/CD
 
 GitHub Actions workflows:
-- **test.yml** - Runs test suite on push/PR to main
+- **test.yml** - Runs test suite on push/PR
 - **docker-build-push.yml** - Builds and pushes images to GHCR
-- **release.yml** - Semantic release triggered on release branch
-
-Images are tagged: `latest`, `main`, `vX.Y.Z`, `vX.Y`, `vX`

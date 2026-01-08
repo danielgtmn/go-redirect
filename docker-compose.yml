@@ -1,47 +1,18 @@
 services:
-  caddy:
-    # Use pre-built image from GHCR or build locally
-    # image: ghcr.io/danielgtmn/caddy-redirect:latest
+  redirect:
     build: .
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:8080"
     environment:
-      # Haupt-Domain (erforderlich)
-      - CADDY_DOMAIN=${CADDY_DOMAIN:-localhost}
+      # Ziel-URL (erforderlich)
+      - REDIRECT_TARGET=${REDIRECT_TARGET:-https://example.com}
 
-      # TLS-Konfiguration (z.B.: "tls admin@example.com" für Let's Encrypt)
-      - CADDY_TLS=${CADDY_TLS:-}
+      # Redirect-Code (301 = permanent, 302 = temporary)
+      - REDIRECT_CODE=${REDIRECT_CODE:-301}
 
-      # Upstream-Server (wo Anfragen weitergeleitet werden)
-      - CADDY_UPSTREAM=${CADDY_UPSTREAM:-http://localhost:8080}
+      # Pfad und Query-Parameter beibehalten
+      - PRESERVE_PATH=${PRESERVE_PATH:-true}
 
-      # Zusätzliche Security-Header (werden zu den Standard-Security-Headern hinzugefügt)
-      - CADDY_SECURITY_HEADERS=${CADDY_SECURITY_HEADERS:-}
-
-      # Zusätzliche Header
-      - CADDY_HEADERS=${CADDY_HEADERS:-}
-
-      # Rate Limiting (z.B.: "rate_limit { zone static { key {remote} window 1m burst 10 } }")
-      - CADDY_RATE_LIMIT=${CADDY_RATE_LIMIT:-}
-
-      # Basic Auth (z.B.: "basicauth { user $2a$14$... }")
-      - CADDY_BASIC_AUTH=${CADDY_BASIC_AUTH:-}
-
-      # Redirects (z.B.: "redir /old /new permanent")
-      - CADDY_REDIRECTS=${CADDY_REDIRECTS:-}
-
-      # Zusätzliche Proxy-Header
-      - CADDY_PROXY_HEADERS=${CADDY_PROXY_HEADERS:-}
-
-      # Zusätzliche Domains (durch Komma getrennt)
-      - CADDY_ADDITIONAL_DOMAINS=${CADDY_ADDITIONAL_DOMAINS:-}
-    volumes:
-      # Für automatische HTTPS-Zertifikate
-      - caddy_data:/data
-      - caddy_config:/config
+      # Port (intern)
+      - PORT=${PORT:-8080}
     restart: unless-stopped
-
-volumes:
-  caddy_data:
-  caddy_config:
