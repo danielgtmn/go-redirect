@@ -5,7 +5,7 @@ FROM caddy:2-alpine
 # with necessary capabilities for binding to ports 80 and 443
 
 # Copy Caddyfile
-COPY --chown=caddy:caddy Caddyfile /etc/caddy/Caddyfile
+COPY Caddyfile /etc/caddy/Caddyfile
 
 # Use non-root user
 USER caddy
