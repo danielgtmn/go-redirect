@@ -12,7 +12,7 @@ A flexible Docker container based on Caddy that configures redirects and reverse
 - **Security by default** - Runs as non-root user, includes security headers out of the box
 - **Container orchestration ready** - Built-in healthcheck for Kubernetes/Docker Swarm
 - **Flexible configuration** - All settings via environment variables
-- **Automatic HTTPS** - Let's Encrypt integration with email configuration
+- **Automatic HTTPS** - Let's Encrypt integration via `CADDY_TLS`
 
 ## Quick Start
 
@@ -27,7 +27,7 @@ docker run -d \
   -p 80:80 \
   -p 443:443 \
   -e CADDY_DOMAIN=yourdomain.com \
-  -e CADDY_EMAIL=admin@yourdomain.com \
+  -e CADDY_TLS="tls admin@yourdomain.com" \
   -e CADDY_UPSTREAM=http://your-app:8080 \
   -v caddy_data:/data \
   -v caddy_config:/config \
@@ -65,7 +65,7 @@ docker run -d \
   -p 80:80 \
   -p 443:443 \
   -e CADDY_DOMAIN=yourdomain.com \
-  -e CADDY_EMAIL=admin@yourdomain.com \
+  -e CADDY_TLS="tls admin@yourdomain.com" \
   -e CADDY_UPSTREAM=http://your-app:8080 \
   -v caddy_data:/data \
   -v caddy_config:/config \
@@ -79,7 +79,7 @@ docker run -d \
 | Variable         | Description                   | Example                 |
 | ---------------- | ----------------------------- | ----------------------- |
 | `CADDY_DOMAIN`   | Main domain (required)        | `example.com`           |
-| `CADDY_EMAIL`    | Email for Let's Encrypt       | `admin@example.com`     |
+| `CADDY_TLS`      | TLS config for Let's Encrypt  | `tls admin@example.com` |
 | `CADDY_UPSTREAM` | Target server for redirection | `http://localhost:8080` |
 
 ### Advanced Configuration
@@ -136,7 +136,7 @@ docker run -d --name caddy-redirect \
 ```bash
 # .env
 CADDY_DOMAIN=secure-app.com
-CADDY_EMAIL=admin@secure-app.com
+CADDY_TLS=tls admin@secure-app.com
 CADDY_UPSTREAM=http://localhost:8080
 CADDY_BASIC_AUTH=basicauth { admin $2a$14$9xv0MtX8mJ2N/.5jUwJcO8qhQ5QE2ZrGj5JvZK5vT5rXnHkYjx6y }
 ```
@@ -147,7 +147,7 @@ CADDY_BASIC_AUTH=basicauth { admin $2a$14$9xv0MtX8mJ2N/.5jUwJcO8qhQ5QE2ZrGj5JvZK
 docker run -d --name caddy-redirect \
   -p 80:80 -p 443:443 \
   -e CADDY_DOMAIN=secure-app.com \
-  -e CADDY_EMAIL=admin@secure-app.com \
+  -e CADDY_TLS=tls admin@secure-app.com \
   -e CADDY_UPSTREAM=http://localhost:8080 \
   -e CADDY_BASIC_AUTH="basicauth { admin \$2a\$14\$9xv0MtX8mJ2N/.5jUwJcO8qhQ5QE2ZrGj5JvZK5vT5rXnHkYjx6y }" \
   -v caddy_data:/data \
@@ -162,7 +162,7 @@ docker run -d --name caddy-redirect \
 ```bash
 # .env
 CADDY_DOMAIN=api.example.com
-CADDY_EMAIL=admin@example.com
+CADDY_TLS=tls admin@example.com
 CADDY_UPSTREAM=http://localhost:8080
 CADDY_RATE_LIMIT=rate_limit { zone static { key {remote} window 1m burst 100 } }
 CADDY_REDIRECTS=redir /v1 /v2 permanent
@@ -175,7 +175,7 @@ CADDY_HEADERS=header X-Forwarded-Proto {scheme}
 docker run -d --name caddy-redirect \
   -p 80:80 -p 443:443 \
   -e CADDY_DOMAIN=api.example.com \
-  -e CADDY_EMAIL=admin@example.com \
+  -e CADDY_TLS=tls admin@example.com \
   -e CADDY_UPSTREAM=http://localhost:8080 \
   -e CADDY_RATE_LIMIT="rate_limit { zone static { key {remote} window 1m burst 100 } }" \
   -e CADDY_REDIRECTS="redir /v1 /v2 permanent" \
@@ -322,7 +322,7 @@ You can also manually trigger the build workflow from the GitHub Actions tab.
 
 ## HTTPS Certificates
 
-When `CADDY_EMAIL` is set, HTTPS certificates are automatically obtained from Let's Encrypt. Certificates are stored in Docker volumes and reused on restarts.
+When `CADDY_TLS` is set (e.g., `tls admin@example.com`), HTTPS certificates are automatically obtained from Let's Encrypt. Certificates are stored in Docker volumes and reused on restarts.
 
 ## Multiple Domains
 
@@ -341,7 +341,7 @@ CADDY_ADDITIONAL_DOMAINS=www.example.com,api.example.com,staging.example.com
 
 ### HTTPS doesn't work
 
-- Ensure `CADDY_EMAIL` is set
+- Ensure `CADDY_TLS` is set (e.g., `tls admin@example.com`)
 - Check that port 443 is not blocked
 - Wait up to 5 minutes for certificate issuance
 

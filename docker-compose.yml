@@ -10,8 +10,8 @@ services:
       # Haupt-Domain (erforderlich)
       - CADDY_DOMAIN=${CADDY_DOMAIN:-localhost}
 
-      # E-Mail für automatische HTTPS-Zertifikate
-      - CADDY_EMAIL=${CADDY_EMAIL:-}
+      # TLS-Konfiguration (z.B.: "tls admin@example.com" für Let's Encrypt)
+      - CADDY_TLS=${CADDY_TLS:-}
 
       # Upstream-Server (wo Anfragen weitergeleitet werden)
       - CADDY_UPSTREAM=${CADDY_UPSTREAM:-http://localhost:8080}

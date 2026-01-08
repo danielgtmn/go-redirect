@@ -1,7 +1,7 @@
 # Main domain (required)
 {$CADDY_DOMAIN:localhost} {
-	# Automatic HTTPS when EMAIL is set
-	{$CADDY_EMAIL:}
+	# TLS configuration (e.g., "tls admin@example.com" for Let's Encrypt)
+	{$CADDY_TLS:}
 
 	# Security headers (enabled by default)
 	header {
