@@ -24,8 +24,9 @@ docker-compose up -d
 
 ## Architecture
 
-- **main.go** - Go HTTP server with redirect logic
+- **cmd/redirect/main.go** - Go HTTP server with redirect logic
 - **go.mod** - Go module definition
+- **scanner_paths.json** - Default blocked scanner paths
 - **Dockerfile** - Multi-stage build (scratch-based)
 - **docker-compose.yml** - Docker Compose configuration
 
@@ -36,7 +37,12 @@ docker-compose up -d
 | `REDIRECT_TARGET` | Target URL (required) | - |
 | `REDIRECT_CODE` | 301 or 302 | `301` |
 | `PRESERVE_PATH` | Keep path and query | `true` |
+| `BLOCK_SCANNERS` | Block scanner paths | `false` |
+| `BLOCKED_PATHS_FILE` | Custom paths JSON | `/scanner_paths.json` |
+| `LOG_LEVEL` | debug/info/warn/error/none | `info` |
 | `PORT` | Server port | `8080` |
+
+IPs are fully anonymized in logs (`x.x.x.x`).
 
 ## Git Hooks
 
