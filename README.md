@@ -39,6 +39,7 @@ Replace `danielgtmn` with your GitHub username if you're using a fork.
 ### Option 1: Docker Compose (Recommended)
 
 1. Copy the example configuration:
+
    ```bash
    cp env.example .env
    ```
@@ -75,33 +76,33 @@ docker run -d \
 
 ### Basic Configuration
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `CADDY_DOMAIN` | Main domain (required) | `example.com` |
-| `CADDY_EMAIL` | Email for Let's Encrypt | `admin@example.com` |
+| Variable         | Description                   | Example                 |
+| ---------------- | ----------------------------- | ----------------------- |
+| `CADDY_DOMAIN`   | Main domain (required)        | `example.com`           |
+| `CADDY_EMAIL`    | Email for Let's Encrypt       | `admin@example.com`     |
 | `CADDY_UPSTREAM` | Target server for redirection | `http://localhost:8080` |
 
 ### Advanced Configuration
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `CADDY_SECURITY_HEADERS` | Additional security headers (added to defaults) | `Permissions-Policy "geolocation=()"` |
-| `CADDY_HEADERS` | Additional HTTP headers | `header X-Forwarded-Proto {scheme}` |
-| `CADDY_RATE_LIMIT` | Rate limiting rules | `rate_limit { zone static { key {remote} window 1m burst 10 } }` |
-| `CADDY_BASIC_AUTH` | Basic authentication | `basicauth { user $2a$14$... }` |
-| `CADDY_REDIRECTS` | URL redirects | `redir /old /new permanent` |
-| `CADDY_PROXY_HEADERS` | Proxy-specific headers | `header_up Host {host}` |
-| `CADDY_ADDITIONAL_DOMAINS` | Additional domains | `www.example.com,api.example.com` |
+| Variable                   | Description                                     | Example                                                          |
+| -------------------------- | ----------------------------------------------- | ---------------------------------------------------------------- |
+| `CADDY_SECURITY_HEADERS`   | Additional security headers (added to defaults) | `Permissions-Policy "geolocation=()"`                            |
+| `CADDY_HEADERS`            | Additional HTTP headers                         | `header X-Forwarded-Proto {scheme}`                              |
+| `CADDY_RATE_LIMIT`         | Rate limiting rules                             | `rate_limit { zone static { key {remote} window 1m burst 10 } }` |
+| `CADDY_BASIC_AUTH`         | Basic authentication                            | `basicauth { user $2a$14$... }`                                  |
+| `CADDY_REDIRECTS`          | URL redirects                                   | `redir /old /new permanent`                                      |
+| `CADDY_PROXY_HEADERS`      | Proxy-specific headers                          | `header_up Host {host}`                                          |
+| `CADDY_ADDITIONAL_DOMAINS` | Additional domains                              | `www.example.com,api.example.com`                                |
 
 ### Default Security Headers
 
 The following security headers are enabled by default:
 
-| Header | Value |
-|--------|-------|
-| `X-Content-Type-Options` | `nosniff` |
-| `X-Frame-Options` | `DENY` |
-| `Referrer-Policy` | `strict-origin-when-cross-origin` |
+| Header                   | Value                             |
+| ------------------------ | --------------------------------- |
+| `X-Content-Type-Options` | `nosniff`                         |
+| `X-Frame-Options`        | `DENY`                            |
+| `Referrer-Policy`        | `strict-origin-when-cross-origin` |
 
 Use `CADDY_SECURITY_HEADERS` to add additional headers like `Content-Security-Policy` or `Permissions-Policy`.
 
@@ -110,6 +111,7 @@ Use `CADDY_SECURITY_HEADERS` to add additional headers like `Content-Security-Po
 ### Simple Redirection
 
 **Docker Compose:**
+
 ```bash
 # .env
 CADDY_DOMAIN=my-app.de
@@ -117,6 +119,7 @@ CADDY_UPSTREAM=http://localhost:3000
 ```
 
 **Docker Run:**
+
 ```bash
 docker run -d --name caddy-redirect \
   -p 80:80 -p 443:443 \
@@ -129,6 +132,7 @@ docker run -d --name caddy-redirect \
 ### With HTTPS and Basic Auth
 
 **Docker Compose:**
+
 ```bash
 # .env
 CADDY_DOMAIN=secure-app.com
@@ -138,6 +142,7 @@ CADDY_BASIC_AUTH=basicauth { admin $2a$14$9xv0MtX8mJ2N/.5jUwJcO8qhQ5QE2ZrGj5JvZK
 ```
 
 **Docker Run:**
+
 ```bash
 docker run -d --name caddy-redirect \
   -p 80:80 -p 443:443 \
@@ -153,6 +158,7 @@ docker run -d --name caddy-redirect \
 ### With Rate Limiting and Redirects
 
 **Docker Compose:**
+
 ```bash
 # .env
 CADDY_DOMAIN=api.example.com
@@ -164,6 +170,7 @@ CADDY_HEADERS=header X-Forwarded-Proto {scheme}
 ```
 
 **Docker Run:**
+
 ```bash
 docker run -d --name caddy-redirect \
   -p 80:80 -p 443:443 \
@@ -252,6 +259,7 @@ This repository includes GitHub Actions workflows that automatically build and p
 ### Automatic Builds & Releases
 
 Images are automatically built and pushed when:
+
 - Pushing to the `main` branch (development builds)
 - Opening pull requests
 - After successful releases (versioned builds)
@@ -261,6 +269,7 @@ Images are automatically built and pushed when:
 ### Image Tags
 
 Available tags in `ghcr.io/danielgtmn/caddy-redirect`:
+
 - `latest` - Latest build from main branch
 - `main` - Latest build from main branch
 - `v1.2.3` - Specific version tags (auto-generated)
@@ -326,15 +335,18 @@ CADDY_ADDITIONAL_DOMAINS=www.example.com,api.example.com,staging.example.com
 ## Troubleshooting
 
 ### Container won't start
+
 - Check the `.env` file for syntax errors
 - Ensure required environment variables are set
 
 ### HTTPS doesn't work
+
 - Ensure `CADDY_EMAIL` is set
 - Check that port 443 is not blocked
 - Wait up to 5 minutes for certificate issuance
 
 ### Upstream server unreachable
+
 - Ensure the upstream server is running
 - Check the `CADDY_UPSTREAM` URL
 - Use `docker-compose logs` for detailed errors
@@ -358,11 +370,13 @@ docker-compose -f docker-compose.test.yml down
 ### GitHub Actions Tests
 
 Tests run automatically on:
+
 - **Push to main**: Full test suite
 - **Pull Requests**: Full test suite
 - **Manual trigger**: Via Actions tab
 
 The tests cover:
+
 - ✅ Caddyfile syntax validation
 - ✅ Docker build success
 - ✅ Container startup
@@ -371,15 +385,15 @@ The tests cover:
 
 ### Test Coverage
 
-| Test Type | Description | Status |
-|-----------|-------------|---------|
-| Syntax Validation | Caddyfile syntax check | ✅ Automated |
-| Docker Build | Container builds successfully | ✅ Automated |
-| Startup Test | Container starts without errors | ✅ Automated |
-| Healthcheck | Container health monitoring | ✅ Built-in |
-| HTTP Proxy | Requests are properly forwarded | ✅ Automated |
-| ENV Vars | Configuration via environment | ✅ Automated |
-| Integration | Full stack with backend | ✅ Manual/Local |
+| Test Type         | Description                     | Status          |
+| ----------------- | ------------------------------- | --------------- |
+| Syntax Validation | Caddyfile syntax check          | ✅ Automated    |
+| Docker Build      | Container builds successfully   | ✅ Automated    |
+| Startup Test      | Container starts without errors | ✅ Automated    |
+| Healthcheck       | Container health monitoring     | ✅ Built-in     |
+| HTTP Proxy        | Requests are properly forwarded | ✅ Automated    |
+| ENV Vars          | Configuration via environment   | ✅ Automated    |
+| Integration       | Full stack with backend         | ✅ Manual/Local |
 
 ## Contributing
 
@@ -388,6 +402,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ### Development Setup
 
 1. **Install dependencies:**
+
    ```bash
    pnpm install  # or npm install
    ```
@@ -416,6 +431,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ```
 
 **Alternative manual approach:**
+
 ```bash
 # Create tag manually
 git tag -a v1.0.0 -m "Release v1.0.0"
@@ -425,6 +441,7 @@ git push origin v1.0.0
 ```
 
 **What happens:**
+
 - ✅ Git tag is created and pushed
 - ✅ Docker images are automatically built (latest + version)
 - ✅ GitHub Release is manually created with release notes
@@ -435,11 +452,13 @@ git push origin v1.0.0
 This repository uses branch protection to ensure code quality:
 
 #### `main` Branch (Development)
+
 - ✅ **Require PR reviews** - All changes need approval
 - ✅ **Require status checks** - Tests must pass
 - ✅ **Require up-to-date branches** - Must merge latest changes
 
 #### `release` Branch (Production)
+
 - ✅ **Require PR reviews** - Release changes need approval
 - ✅ **Require status checks** - All tests must pass
 - ✅ **Restrict pushes** - Only maintainers can push directly
@@ -465,6 +484,7 @@ git push origin main
 This project uses descriptive commit messages. While not strictly enforced, following conventional patterns helps with release notes generation.
 
 **Valid commit types:**
+
 ```bash
 # Features
 feat: add new functionality
@@ -491,6 +511,7 @@ perf: improve performance
 ```
 
 **Pre-commit hooks will:**
+
 - ✅ Validate Caddyfile syntax
 - ✅ Check commit message format
 
