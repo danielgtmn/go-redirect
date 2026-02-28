@@ -15,4 +15,8 @@ services:
 
       # Port (intern)
       - PORT=${PORT:-8080}
+
+      # Domain-Mapping: *.source -> *.target (optional, ersetzt REDIRECT_TARGET)
+      # - REDIRECT_DOMAIN_MAP=${REDIRECT_DOMAIN_MAP:-domain.com:domain.de}
+      # - REDIRECT_SCHEME=${REDIRECT_SCHEME:-https}
     restart: unless-stopped

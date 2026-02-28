@@ -106,12 +106,48 @@ func isBlockedPath(path string, blockedPaths []string) bool {
 	return false
 }
 
+func mapDomain(host, sourceDomain, targetDomain string) (string, bool) {
+	host = strings.ToLower(host)
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		host = h
+	}
+
+	if host == sourceDomain {
+		return targetDomain, true
+	}
+
+	suffix := "." + sourceDomain
+	if strings.HasSuffix(host, suffix) {
+		prefix := host[:len(host)-len(suffix)]
+		return prefix + "." + targetDomain, true
+	}
+
+	return "", false
+}
+
 func main() {
 	currentLogLevel = parseLogLevel(os.Getenv("LOG_LEVEL"))
 
 	targetURL := os.Getenv("REDIRECT_TARGET")
-	if targetURL == "" {
-		log.Fatal("REDIRECT_TARGET environment variable is required")
+	domainMap := os.Getenv("REDIRECT_DOMAIN_MAP")
+
+	var sourceDomain, targetDomain string
+	if domainMap != "" {
+		parts := strings.SplitN(domainMap, ":", 2)
+		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+			log.Fatal("REDIRECT_DOMAIN_MAP must be in format 'source:target' (e.g. 'domain.com:domain.de')")
+		}
+		sourceDomain = strings.ToLower(parts[0])
+		targetDomain = strings.ToLower(parts[1])
+	}
+
+	if targetURL == "" && domainMap == "" {
+		log.Fatal("REDIRECT_TARGET or REDIRECT_DOMAIN_MAP environment variable is required")
+	}
+
+	scheme := os.Getenv("REDIRECT_SCHEME")
+	if scheme == "" {
+		scheme = "https"
 	}
 
 	port := os.Getenv("PORT")
@@ -148,11 +184,34 @@ func main() {
 			return
 		}
 
-		target := targetURL
-		if preservePath {
-			target = targetURL + r.URL.Path
-			if r.URL.RawQuery != "" {
-				target += "?" + r.URL.RawQuery
+		var target string
+
+		if domainMap != "" {
+			if newHost, ok := mapDomain(r.Host, sourceDomain, targetDomain); ok {
+				target = scheme + "://" + newHost + r.URL.Path
+				if r.URL.RawQuery != "" {
+					target += "?" + r.URL.RawQuery
+				}
+			} else if targetURL != "" {
+				target = targetURL
+				if preservePath {
+					target = targetURL + r.URL.Path
+					if r.URL.RawQuery != "" {
+						target += "?" + r.URL.RawQuery
+					}
+				}
+			} else {
+				logInfo("%s %s %s -> NOT FOUND (no mapping for host %s)", anonIP, r.Method, r.URL.Path, r.Host)
+				http.NotFound(w, r)
+				return
+			}
+		} else {
+			target = targetURL
+			if preservePath {
+				target = targetURL + r.URL.Path
+				if r.URL.RawQuery != "" {
+					target += "?" + r.URL.RawQuery
+				}
 			}
 		}
 
@@ -161,7 +220,12 @@ func main() {
 	})
 
 	logInfo("Starting redirect server on :%s", port)
-	logInfo("Target: %s (Code: %d, Preserve Path: %v, Block Scanners: %v)", targetURL, redirectCode, preservePath, blockScanners)
+	if domainMap != "" {
+		logInfo("Domain mapping: *.%s -> *.%s (Scheme: %s, Code: %d, Block Scanners: %v)", sourceDomain, targetDomain, scheme, redirectCode, blockScanners)
+	}
+	if targetURL != "" {
+		logInfo("Target: %s (Code: %d, Preserve Path: %v, Block Scanners: %v)", targetURL, redirectCode, preservePath, blockScanners)
+	}
 	logDebug("Log level: %s", os.Getenv("LOG_LEVEL"))
 	if blockScanners && len(blockedPaths) > 0 {
 		logInfo("Blocking %d path patterns", len(blockedPaths))
