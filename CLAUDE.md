@@ -34,13 +34,17 @@ docker-compose up -d
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `REDIRECT_TARGET` | Target URL (required) | - |
+| `REDIRECT_TARGET` | Target URL | - |
+| `REDIRECT_DOMAIN_MAP` | Domain mapping (`source:target`) | - |
+| `REDIRECT_SCHEME` | Scheme for domain map redirects | `https` |
 | `REDIRECT_CODE` | 301 or 302 | `301` |
 | `PRESERVE_PATH` | Keep path and query | `true` |
 | `BLOCK_SCANNERS` | Block scanner paths | `false` |
 | `BLOCKED_PATHS_FILE` | Custom paths JSON | `/scanner_paths.json` |
 | `LOG_LEVEL` | debug/info/warn/error/none | `info` |
 | `PORT` | Server port | `8080` |
+
+Either `REDIRECT_TARGET` or `REDIRECT_DOMAIN_MAP` is required.
 
 IPs are fully anonymized in logs (`x.x.x.x`).
 
